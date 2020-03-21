@@ -1,0 +1,3 @@
+brawlstats
+python-dotenv
+colorama
