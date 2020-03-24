@@ -9,6 +9,9 @@ More features coming soon! PRs are encouraged but the automatic workflow is not 
 - Paste it in the `token.env.example` file for your environment and rename it to `token.env`. Also read the FAQ before using it.
 - Install the requirements using the `requirements.txt` file.
 - The `store.py` script saves the battle logs to a python shelve and the `read.py` file analyzes the logs and gives a report. The `continuous_store.py` and the `continuous_read.py` files are self explanatory!
+- For Windows, you can simply double click the scripts to run on a seperate window; and for Unix based systems, the `start_script.sh` starts the reading in the background and then the `kill_script.sh` kills the currently running process.
+  
+> It is recommended to kill the process before shutting the system down to prevent any garbage data to be written to the log. Preferrably do some manual work to check the last update time and your preferred interval. If you corrupt the data you are responsible, the scritpt isn't.
 
 ## FAQs
 
