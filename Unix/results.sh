@@ -1,0 +1,1 @@
+script -c "python3 read.py" -q > battle_log.txt
