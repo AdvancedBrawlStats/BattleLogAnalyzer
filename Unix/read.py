@@ -9,6 +9,7 @@ width_index = 5
 width_brawler = 8
 width_gamemode = 13
 width_powerplay = 35
+player_name = ''
 
 name_lookup = {
    'soloShowdown': 'Solo Showdown',
@@ -78,21 +79,28 @@ def calculate_trophy_change(battles, num):
 
 def get_brawler_played(battle, player_tag): 
    player_tag = '#'+player_tag.upper()
+   global player_name
    if battle.mode in set([ 'bigGame','roboRumble']):
       return None
    elif battle.mode == 'soloShowdown':
         for i in range (10):
            if battle.players[i].tag == player_tag:
+              if player_name == '':
+                player_name = battle.players[i].name
               return battle.players[i].brawler
    elif battle.mode == 'duoShowdown':
       for i in range (5):
          for j in range(2):
            if battle.teams[i][j].tag == player_tag:
+              if player_name == '':
+                player_name = battle.teams[i][j].name
               return battle.teams[i][j].brawler
    else: 
       for i in range(2):
          for j in range(3):
             if battle.teams[i][j].tag == player_tag:
+               if player_name == '':
+                player_name = battle.teams[i][j].name
                return battle.teams[i][j].brawler
 
 
@@ -181,7 +189,10 @@ def battle_log(data, player_tag):
     if 'POWER-PLAY Points' in brawler_trophy_change:
             deduct_from_total = brawler_trophy_change['POWER-PLAY Points']
     else: deduct_from_total = 0
-    print(f'\nFor {len(listofkeys)} games, total Trophy change was {colourise(sign(trophy_change))}{sign(trophy_change)}{abs(trophy_change-deduct_from_total)}{Fore.RESET}\n{"-"*50}\n{brawler_trophy_changes} {Fore.RESET}')
+    print('='*60)
+    print(f'{player_name:^60}')
+    print('='*60)
+    print(f'For {len(listofkeys)} games, total Trophy change was {colourise(sign(trophy_change))}{sign(trophy_change)}{abs(trophy_change-deduct_from_total)}{Fore.RESET}\n{"-"*50}\n{brawler_trophy_changes} {Fore.RESET}')
 
 
 
@@ -191,3 +202,4 @@ if __name__ == "__main__":
     player_tag = '202JCYQQQ' 
     data = shelve.open(player_tag)
     battle_log(data, player_tag)
+    print('~'*60)
