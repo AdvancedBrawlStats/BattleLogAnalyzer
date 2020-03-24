@@ -2,7 +2,7 @@ import shelve
 from box import Box
 import box
 import time
-from colorama import Fore, Back, init
+from colorama import Fore, init
 init(autoreset=True)
 
 width_index = 5
@@ -126,6 +126,7 @@ def battle_log(data, player_tag, display=True):
     trophy_change = 0
     index = 1
     
+
     for key in listofkeys:
         battle = Box(data[key])
         powerPlay = is_powerplay(battle)

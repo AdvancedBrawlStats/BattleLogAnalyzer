@@ -9,6 +9,7 @@ width_index = 5
 width_brawler = 8
 width_gamemode = 13
 width_powerplay = 35
+player_name = ''
 
 name_lookup = {
    'soloShowdown': 'Solo Showdown',
@@ -78,21 +79,28 @@ def calculate_trophyChange(battles, num):
 
 def get_brawler_played(battle, player_tag): 
    player_tag = '#'+player_tag.upper()
+   global player_name
    if battle.mode in set([ 'bigGame','roboRumble']):
       return None
    elif battle.mode == 'soloShowdown':
         for i in range (10):
            if battle.players[i].tag == player_tag:
+              if player_name == '':
+                player_name = battle.players[i].name
               return battle.players[i].brawler
    elif battle.mode == 'duoShowdown':
       for i in range (5):
          for j in range(2):
            if battle.teams[i][j].tag == player_tag:
+              if player_name == '':
+                player_name = battle.teams[i][j].name
               return battle.teams[i][j].brawler
    else: 
       for i in range(2):
          for j in range(3):
             if battle.teams[i][j].tag == player_tag:
+               if player_name == '':
+                player_name = battle.teams[i][j].name
                return battle.teams[i][j].brawler
 
 
@@ -107,8 +115,9 @@ def colourise(value):
     else:
         return Fore.WHITE
 
-def battle_log(data, player_tag):
-    print(f'{"Num.":^{width_index}}|{"Game Mode":^{width_gamemode+1}}|{"Brawler":^{width_brawler+9}}|{"Outcome":^{20}}\n{"-"*60}')
+def battle_log(data, player_tag, display=True):
+    if display==True:
+        print(f'{"Num.":^{width_index}}|{"Game Mode":^{width_gamemode+1}}|{"Brawler":^{width_brawler+9}}|{"Outcome":^{20}}\n{"-"*60}')
     brawler_trophy_change = {}
     if player_tag[0] == '#':
         player_tag = player_tag[1:]
@@ -134,7 +143,8 @@ def battle_log(data, player_tag):
             elif brawler != None:
                 brawler_details = f'{Fore.WHITE}{brawler.name:>{width_brawler}} (Fri)'  
             try:
-                print(f'{index:>{width_index}}. {Fore.GREEN}{name_lookup[battle.battle.mode]:>{width_gamemode}} {brawler_details} ->{Fore.YELLOW} Rank: {battle.battle.rank} {colourise(sign(battle.battle.trophyChange))}({sign(battle.battle.trophyChange)}{abs(battle.battle.trophyChange)})')
+                if display==True:
+                    print(f'{index:>{width_index}}. {Fore.GREEN}{name_lookup[battle.battle.mode]:>{width_gamemode}} {brawler_details} ->{Fore.YELLOW} Rank: {battle.battle.rank} {colourise(sign(battle.battle.trophyChange))}({sign(battle.battle.trophyChange)}{abs(battle.battle.trophyChange)})')
                 trophy_change += battle.battle.trophyChange
                 if powerPlay:
                     if 'POWER-PLAY Points' in brawler_trophy_change:
@@ -148,7 +158,8 @@ def battle_log(data, player_tag):
                         brawler_trophy_change[brawler.name]=battle.battle.trophyChange
                 
             except box.exceptions.BoxError:
-                print(f'{index:>{width_index}}. {Fore.GREEN}{name_lookup[battle.battle.mode]:>{width_gamemode}} {brawler_details} ->{Fore.YELLOW} Rank: {battle.battle.rank}')
+                if display==True:
+                    print(f'{index:>{width_index}}. {Fore.GREEN}{name_lookup[battle.battle.mode]:>{width_gamemode}} {brawler_details} ->{Fore.YELLOW} Rank: {battle.battle.rank}')
 
         else:
             if battle.battle.type == 'ranked' and brawler != None:
@@ -160,7 +171,8 @@ def battle_log(data, player_tag):
             elif brawler != None:
                   brawler_details = f'{Fore.WHITE}{brawler.name:>{width_brawler}} (Fri)' 
             try:
-                print(f'{index:>{width_index}}. {Fore.CYAN}{name_lookup[battle.battle.mode]:>{width_gamemode}} {brawler_details} ->{Fore.YELLOW} Result: {colourise(battle.battle.result)}{battle.battle.result} {colourise(sign(battle.battle.trophyChange))}({sign(battle.battle.trophyChange)}{abs(battle.battle.trophyChange)})')
+                if display==True:
+                    print(f'{index:>{width_index}}. {Fore.CYAN}{name_lookup[battle.battle.mode]:>{width_gamemode}} {brawler_details} ->{Fore.YELLOW} Result: {colourise(battle.battle.result)}{battle.battle.result} {colourise(sign(battle.battle.trophyChange))}({sign(battle.battle.trophyChange)}{abs(battle.battle.trophyChange)})')
                 trophy_change += battle.battle.trophyChange
                 if powerPlay:
                     if 'POWER-PLAY Points' in brawler_trophy_change:
@@ -173,7 +185,8 @@ def battle_log(data, player_tag):
                     else:
                         brawler_trophy_change[brawler.name]=battle.battle.trophyChange
             except box.exceptions.BoxKeyError:
-                print(f'{index:>{width_index}}. {Fore.CYAN}{name_lookup[battle.battle.mode]:>{width_gamemode}} {brawler_details} ->{Fore.YELLOW} Result: {colourise(battle.battle.result)}{battle.battle.result}{Fore.RESET}')
+                if display==True:
+                    print(f'{index:>{width_index}}. {Fore.CYAN}{name_lookup[battle.battle.mode]:>{width_gamemode}} {brawler_details} ->{Fore.YELLOW} Result: {colourise(battle.battle.result)}{battle.battle.result}{Fore.RESET}')
         index += 1
     brawler_trophy_changes = ''
     for key, value in brawler_trophy_change.items():
@@ -181,7 +194,10 @@ def battle_log(data, player_tag):
     if 'POWER-PLAY Points' in brawler_trophy_change:
             deduct_from_total = brawler_trophy_change['POWER-PLAY Points']
     else: deduct_from_total = 0
-    print(f'\nFor {len(listofkeys)} games, total Trophy change was {colourise(sign(trophy_change))}{sign(trophy_change)}{abs(trophy_change-deduct_from_total)}{Fore.RESET}\n{"-"*50}\n{brawler_trophy_changes} {Fore.RESET}')
+    print('='*60)
+    print(f'{player_name:^60}')
+    print('='*60)
+    print(f'For {len(listofkeys)} games, total Trophy change was {colourise(sign(trophy_change))}{sign(trophy_change)}{abs(trophy_change-deduct_from_total)}{Fore.RESET}\n{"-"*50}\n{brawler_trophy_changes} {Fore.RESET}')
 
 
 
@@ -191,3 +207,4 @@ if __name__ == "__main__":
     player_tag = '202JCYQQQ' 
     data = shelve.open(player_tag)
     battle_log(data, player_tag)
+    print('~'*60)
